@@ -8,7 +8,7 @@ from selenium.common.exceptions import WebDriverException
 import time
 
 
-MAX_WAIT = 10
+MAX_WAIT = 5
 
 
 class NewVisitorTest(LiveServerTestCase):
@@ -45,6 +45,7 @@ class NewVisitorTest(LiveServerTestCase):
 	
 		# Эдит слышала про крутое новое онлайн-приложение со списком неотложенных дел. Она решает оценить его домашнюю страницу.
 		self.browser.get(self.live_server_url)
+		print(self.live_server_url)
 
 		# Она видит, что заголовок и шапка страницы говорят о списках неотложенных дел.
 		self.assertIn('To-Do', self.browser.title)
