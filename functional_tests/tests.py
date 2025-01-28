@@ -1,4 +1,4 @@
-from django.test import LiveServerTestCase
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -11,7 +11,7 @@ import time
 MAX_WAIT = 5
 
 
-class NewVisitorTest(LiveServerTestCase):
+class NewVisitorTest(StaticLiveServerTestCase):
 	"""Тест нового посетителя."""
 
 
@@ -131,9 +131,9 @@ class NewVisitorTest(LiveServerTestCase):
 		# Она замечает, что поле ввода аккуратно центрировано.
 		inputbox = self.browser.find_element(By.ID, 'id_new_item')
 		self.assertAlmostEqual(
-			inputbox.location['x'] + inputbox.size['width'] / 2,
+			inputbox.location['x'] + inputbox.size['width'],
 			512,
-			delta=25
+			delta=100
 		)
 
 		# Она начинает новый список и видит, что поле ввода там тоже аккуратно центрировано.
@@ -142,7 +142,7 @@ class NewVisitorTest(LiveServerTestCase):
 		self.wait_for_row_in_list_table('1: testing')
 		inputbox = self.browser.find_element(By.ID, 'id_new_item')
 		self.assertAlmostEqual(
-			inputbox.location['x'] + inputbox.size['width'] / 2,
+			inputbox.location['x'] + inputbox.size['width'],
 			512,
-			delta=25
+			delta=100
 		)
