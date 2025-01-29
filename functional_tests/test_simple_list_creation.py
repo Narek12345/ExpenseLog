@@ -1,47 +1,12 @@
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.common.exceptions import WebDriverException
 
-import os
-import time
+from .base import FunctionalTest
 
 
-MAX_WAIT = 5
-
-
-class NewVisitorTest(StaticLiveServerTestCase):
+class NewVisitorTest(FunctionalTest):
 	"""Тест нового посетителя."""
-
-
-	def setUp(self):
-		"""Установка."""
-		self.browser = webdriver.Chrome()
-		staging_server = os.environ.get('STAGING_SERVER')
-		if staging_server:
-			self.live_server_url = 'http://' + staging_server
-
-
-	def tearDown(self):
-		"""Демонтаж."""
-		self.browser.quit()
-
-
-	def wait_for_row_in_list_table(self, row_text):
-		"""Ожидает строку в таблице списка."""
-		start_time = time.time()
-		while True:
-			try:
-				table = self.browser.find_element(By.ID, 'id_list_table')
-				rows = table.find_elements(By.TAG_NAME, 'tr')
-				self.assertIn(row_text, [row.text for row in rows])
-				return
-			except (AssertionError, WebDriverException) as e:
-				if time.time() - start_time > MAX_WAIT:
-					raise e
-				time.sleep(0.5)
 
 
 	def test_can_start_a_list_for_one_user(self):
@@ -49,7 +14,6 @@ class NewVisitorTest(StaticLiveServerTestCase):
 	
 		# Эдит слышала про крутое новое онлайн-приложение со списком неотложенных дел. Она решает оценить его домашнюю страницу.
 		self.browser.get(self.live_server_url)
-		print(self.live_server_url)
 
 		# Она видит, что заголовок и шапка страницы говорят о списках неотложенных дел.
 		self.assertIn('To-Do', self.browser.title)
@@ -124,29 +88,3 @@ class NewVisitorTest(StaticLiveServerTestCase):
 		self.assertIn('Купить молоко', page_text)
 
 		# Удовлетворенные, они оба ложатся спать.
-
-
-	def test_layout_and_styling(self):
-		"""Тест макета и стилевого оформления."""
-		# Эдит открывает домашнюю страницу.
-		self.browser.get(self.live_server_url)
-		self.browser.set_window_size(1024, 768)
-
-		# Она замечает, что поле ввода аккуратно центрировано.
-		inputbox = self.browser.find_element(By.ID, 'id_new_item')
-		self.assertAlmostEqual(
-			inputbox.location['x'] + inputbox.size['width'],
-			512,
-			delta=100
-		)
-
-		# Она начинает новый список и видит, что поле ввода там тоже аккуратно центрировано.
-		inputbox.send_keys('testing')
-		inputbox.send_keys(Keys.ENTER)
-		self.wait_for_row_in_list_table('1: testing')
-		inputbox = self.browser.find_element(By.ID, 'id_new_item')
-		self.assertAlmostEqual(
-			inputbox.location['x'] + inputbox.size['width'],
-			512,
-			delta=100
-		)
