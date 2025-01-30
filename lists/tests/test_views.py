@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.utils.html import escape
 
 from lists.models import Item, List
 
@@ -73,6 +74,15 @@ class NewListTest(TestCase):
 		self.assertRedirects(response, f'/lists/{new_list.id}')
 
 
+	def test_validation_errors_are_sent_back_to_home_page_template(self):
+		"""Тест: ошибки валидации отсылаются назад в шаблон домашней страницы."""
+		response = self.client.post('/lists/new', data={'item_text': ''})
+		self.assertEqual(response.status_code, 200)
+		self.assertTemplateUsed(response, 'home.html')
+		expected_error = escape("You can't have an empty list item")
+		self.assertContains(response, expected_error)
+
+
 
 class NewItemTest(TestCase):
 	"""Тест нового элемента списка."""
@@ -105,3 +115,15 @@ class NewItemTest(TestCase):
 		)
 
 		self.assertRedirects(response, f'/lists/{correct_list.id}')
+
+
+	def test_validation_errors_are_sent_back_to_home_page_template(self):
+		"""Тест: ошибки валидации отсылаются назад в шаблон домашней страницы."""
+		pass
+
+
+	def test_invalid_list_items_arent_saved(self):
+		"""Тест: сохраняются недопустимые элементы списка."""
+		self.client.post('/lists/new', data={'item_text': ''})
+		self.assertEqual(List.objects.count(), 0)
+		self.assertEqual(Item.objects.count(), 0)
