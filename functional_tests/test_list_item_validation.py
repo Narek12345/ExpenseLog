@@ -29,10 +29,9 @@ class ItemValidationTest(FunctionalTest):
 		self.browser.find_element(By.ID, 'id_new_item').send_keys(Keys.ENTER)
 
 		# Эдит получает аналогичное предупреждение на странице списка.
-		self.wait_for(
-			self.browser.find_element(By.CSS_SELECTOR, '.has-error').text,
-			"You can't have an empty list item"
-		)
+		self.wait_for(lambda: self.assertEqual(
+			self.browser.find_element(By.CSS_SELECTOR, '.has-error').text, "You can't have an empty list item"
+		))
 
 		# И она может его исправить, заполнив поле неким текстом.
 		self.browser.find_element(By.ID, 'id_new_item').send_keys('Make tea')
