@@ -15,6 +15,15 @@ class ListAndItemModelsTest(TestCase):
 		self.assertEqual(item.text, '')
 
 
+	def test_item_is_related_to_list(self):
+		"""Тест: элемент связан со списком."""
+		list_ = List.objects.create()
+		item = Item()
+		item.list = list_
+		item.save()
+		self.assertIn(item, list_.item_set.all())
+
+
 	def test_cannot_save_empty_list_items(self):
 		"""Тест: нельзя добавлять пустые элементы списка."""
 		list_ = List.objects.create()
