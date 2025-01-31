@@ -5,14 +5,19 @@ from lists.models import Item, List
 
 
 
-class ListAndItemModelsTest(TestCase):
-	"""Тест модели элемента списка."""
+class ItemModelTest(TestCase):
+	"""Тест модели элемента."""
 
 
 	def test_default_text(self):
 		"""Тест заданного по умолчанию текста."""
 		item = Item()
 		self.assertEqual(item.text, '')
+
+
+
+class ListAndItemModelsTest(TestCase):
+	"""Тест модели элемента списка."""
 
 
 	def test_item_is_related_to_list(self):
