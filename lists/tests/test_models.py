@@ -9,6 +9,12 @@ class ListAndItemModelsTest(TestCase):
 	"""Тест модели элемента списка."""
 
 
+	def test_default_text(self):
+		"""Тест заданного по умолчанию текста."""
+		item = Item()
+		self.assertEqual(item.text, '')
+
+
 	def test_cannot_save_empty_list_items(self):
 		"""Тест: нельзя добавлять пустые элементы списка."""
 		list_ = List.objects.create()
