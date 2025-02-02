@@ -2,6 +2,8 @@ from unittest.mock import patch, call
 
 from django.test import TestCase
 
+from accounts.models import Token
+
 
 
 class SendLoginEmailViewTest(TestCase):
@@ -41,6 +43,15 @@ class SendLoginEmailViewTest(TestCase):
 			mock_messages.success.call_args,
 			call(response.wsgi_request, expected),
 		)
+
+
+	def test_creates_token_associated_with_email(self):
+		"""Тест: создается маркер, связанный с электронной почтой."""
+		self.client.post('/accounts/send_login_email', data={
+			'email': 'edith@example.com'
+		})
+		token = Token.objects.first()
+		self.assertEqual(token.email, 'edith@example.com')
 
 
 
