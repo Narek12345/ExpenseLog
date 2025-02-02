@@ -54,6 +54,19 @@ class SendLoginEmailViewTest(TestCase):
 		self.assertEqual(token.email, 'edith@example.com')
 
 
+	@patch('accounts.views.send_mail')
+	def test_sends_link_to_login_using_token_uid(self, mock_send_mail):
+		"""Тест: отсылается ссылка на вход в систему, используя uid маркера."""
+		self.client.post('/accounts/send_login_email', data={
+			'email': 'edith@example.com'
+		})
+
+		token = Token.objects.first()
+		expected_url = f'http://testserver/accounts/login?token={token.uid}'
+		(subject, body, from_email, to_list), kwargs = mock_send_mail.call_args
+		self.assertIn(expected_url, body)
+
+
 
 class LoginViewTest(TestCase):
 	"""Тест представления входа в систему."""
