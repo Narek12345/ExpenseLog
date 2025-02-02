@@ -1,3 +1,21 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.core.mail import send_mail
+from django.contrib import messages
 
-# Create your views here.
+
+def send_login_email(request):
+	"""Отправить сообщение для входа в систему."""
+	email = request.POST['email']
+	send_mail(
+		'Your login link for SuperLists',
+		'body text tbc',
+		'narekbayanduryan16@gmail.com',
+		[email]
+	)
+
+	messages.success(
+		request,
+		"Check your email, you'll find a message with a link that will log you into the site.",
+	)
+
+	return redirect('/')
