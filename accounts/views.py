@@ -8,7 +8,7 @@ def send_login_email(request):
 	email = request.POST['email']
 	send_mail(
 		'Your login link for SuperLists',
-		'body text tbc',
+		'Use this link to log in',
 		'narekbayanduryan16@gmail.com',
 		[email]
 	)
