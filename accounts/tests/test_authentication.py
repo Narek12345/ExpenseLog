@@ -16,7 +16,8 @@ class AuthenticateTest(TestCase):
 	def test_returns_None_if_no_such_token(self):
 		"""Тест: возвращается None, если нет такого маркера."""
 		result = PasswordlessAuthenticationBackend().authenticate(
-			'no-such-token'
+			request=None,
+			uid='no-such-token',
 		)
 		self.assertIsNone(result)
 
@@ -25,7 +26,7 @@ class AuthenticateTest(TestCase):
 		"""Тест: возвращается новый пользователь с правильной электронной почтой, если маркер существует."""
 		email = 'edith@example.com'
 		token = Token.objects.create(email=email)
-		user = PasswordlessAuthenticationBackend().authenticate(token.uid)
+		user = PasswordlessAuthenticationBackend().authenticate(request=None, uid=token.uid)
 		new_user = User.objects.get(email=email)
 		self.assertEqual(user, new_user)
 
@@ -35,7 +36,7 @@ class AuthenticateTest(TestCase):
 		email = 'edith@example.com'
 		existing_user = User.objects.create(email=email)
 		token = Token.objects.create(email=email)
-		user = PasswordlessAuthenticationBackend().authenticate(token.uid)
+		user = PasswordlessAuthenticationBackend().authenticate(request=None, uid=token.uid)
 		self.assertEqual(user, existing_user)
 
 
