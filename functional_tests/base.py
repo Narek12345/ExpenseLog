@@ -12,11 +12,11 @@ MAX_WAIT = 5
 
 
 def wait(fn):
-	def modified_fn():
+	def modified_fn(*args, **kwargs):
 		start_time = time.time()
 		while True:
 			try:
-				return fn()
+				return fn(*args, **kwargs)
 			except (AssertionError, WebDriverException) as e:
 				if time.time() - start_time > MAX_WAIT:
 					raise e
@@ -42,19 +42,12 @@ class FunctionalTest(StaticLiveServerTestCase):
 		self.browser.quit()
 
 
+	@wait
 	def wait_for_row_in_list_table(self, row_text):
 		"""Ожидает строку в таблице списка."""
-		start_time = time.time()
-		while True:
-			try:
-				table = self.browser.find_element(By.ID, 'id_list_table')
-				rows = table.find_elements(By.TAG_NAME, 'tr')
-				self.assertIn(row_text, [row.text for row in rows])
-				return
-			except (AssertionError, WebDriverException) as e:
-				if time.time() - start_time > MAX_WAIT:
-					raise e
-				time.sleep(0.5)
+		table = self.browser.find_element(By.ID, 'id_list_table')
+		rows = table.find_elements(By.TAG_NAME, 'tr')
+		self.assertIn(row_text, [row.text for row in rows])
 
 
 	def wait_for(self, fn):
@@ -74,21 +67,17 @@ class FunctionalTest(StaticLiveServerTestCase):
 		return self.browser.find_element(By.ID, 'id_text')
 
 
+	@wait
 	def wait_to_be_logged_in(self, email):
 		"""Ожидать входа в систему."""
-		self.wait_for(
-			lambda:
-				self.browser.find_element(By.LINK_TEXT, 'Log out')
-		)
+		self.browser.find_element(By.LINK_TEXT, 'Log out')
 		navbar = self.browser.find_element(By.CSS_SELECTOR, '.navbar')
 		self.assertIn(email, navbar.text)
 
 
+	@wait
 	def wait_to_be_logged_out(self, email):
 		"""Ожидать выхода из системы."""
-		self.wait_for(
-			lambda:
-				self.browser.find_element(By.NAME, 'email')
-		)
+		self.browser.find_element(By.NAME, 'email')
 		navbar = self.browser.find_element(By.CSS_SELECTOR, '.navbar')
 		self.assertNotIn(email, navbar.text)
