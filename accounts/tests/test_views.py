@@ -73,7 +73,7 @@ class LoginViewTest(TestCase):
 	"""Тест представления входа в систему."""
 
 
-	def test_redirects_to_home_page(self):
+	def test_redirects_to_home_page(self, mock_auth):
 		"""Тест: переадресуется на домашнюю страницу."""	
 		response = self.client.get('/accounts/login?token=abcd123')
 		self.assertRedirects(response, '/')
