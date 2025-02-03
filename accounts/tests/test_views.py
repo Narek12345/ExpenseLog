@@ -76,3 +76,13 @@ class LoginViewTest(TestCase):
 		"""Тест: переадресуется на домашнюю страницу."""	
 		response = self.client.get('/accounts/login?token=abcd123')
 		self.assertRedirects(response, '/')
+
+
+	@patch('accounts.views.auth')
+	def test_calls_authenticate_with_uid_from_get_request(self, mock_auth):
+		"""Тест: вызывается authenticate с uid из GET-запроса."""
+		self.client.get('/accounts/login?token=abcd123')
+		self.assertEqual(
+			mock_auth.authenticate.call_args,
+			call(uid='abcd123')
+		)
