@@ -6,7 +6,7 @@ class PasswordlessAuthenticationBackend(object):
 	"""Беспарольный серверный процессор аутентификации."""
 
 
-	def authenticate(self, uid):
+	def authenticate(self, request, uid):
 		"""Аутентифицировать."""
 		try:
 			token = Token.objects.get(uid=uid)
