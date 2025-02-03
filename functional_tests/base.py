@@ -69,3 +69,13 @@ class FunctionalTest(StaticLiveServerTestCase):
 		)
 		navbar = self.browser.find_element(By.CSS_SELECTOR, '.navbar')
 		self.assertIn(email, navbar.text)
+
+
+	def wait_to_be_logged_out(self, email):
+		"""Ожидать выхода из системы."""
+		self.wait_for(
+			lambda:
+				self.browser.find_element(By.NAME, 'email')
+		)
+		navbar = self.browser.find_element(By.CSS_SELECTOR, '.navbar')
+		self.assertNotIn(email, navbar.text)
