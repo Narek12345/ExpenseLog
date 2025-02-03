@@ -37,3 +37,18 @@ class AuthenticateTest(TestCase):
 		token = Token.objects.create(email=email)
 		user = PasswordlessAuthenticationBackend().authenticate(token.uid)
 		self.assertEqual(user, existing_user)
+
+
+
+class GetUserTest(TestCase):
+	"""Тест получения пользователя."""
+
+
+	def test_gets_user_by_email(self):
+		"""Тест: получает пользователя по адресу электронной почты."""
+		User.objects.create(email='another@example.com')
+		desired_user = User.objects.create(email='edith@example.com')
+		found_user = PasswordlessAuthenticationBackend().get_user(
+			'edith@example.com'
+		)
+		self.assertEqual(found_user, desired_user)
