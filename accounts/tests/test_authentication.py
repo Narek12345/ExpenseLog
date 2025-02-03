@@ -19,3 +19,12 @@ class AuthenticateTest(TestCase):
 			'no-such-token'
 		)
 		self.assertIsNone(result)
+
+
+	def test_returns_new_user_with_correct_email_if_token_exists(self):
+		"""Тест: возвращается новый пользователь с правильной электронной почтой, если маркер существует."""
+		email = 'edith@example.com'
+		token = Token.objects.create(email=email)
+		user = PasswordlessAuthenticationBackend().authenticate(token.uid)
+		new_user = User.objects.get(email=email)
+		self.assertEqual(user, new_user)
