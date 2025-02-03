@@ -28,3 +28,12 @@ class AuthenticateTest(TestCase):
 		user = PasswordlessAuthenticationBackend().authenticate(token.uid)
 		new_user = User.objects.get(email=email)
 		self.assertEqual(user, new_user)
+
+
+	def test_returns_existing_user_with_correct_email_if_token_exists(self):
+		"""Тест: возвращается существующий пользователь с правильной электронной почтой, если маркер существует."""
+		email = 'edith@example.com'
+		existing_user = User.objects.create(email=email)
+		token = Token.objects.create(email=email)
+		user = PasswordlessAuthenticationBackend().authenticate(token.uid)
+		self.assertEqual(user, existing_user)
