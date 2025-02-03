@@ -68,6 +68,7 @@ class SendLoginEmailViewTest(TestCase):
 
 
 
+@patch('accounts.views.auth')
 class LoginViewTest(TestCase):
 	"""Тест представления входа в систему."""
 
@@ -78,7 +79,6 @@ class LoginViewTest(TestCase):
 		self.assertRedirects(response, '/')
 
 
-	@patch('accounts.views.auth')
 	def test_calls_authenticate_with_uid_from_get_request(self, mock_auth):
 		"""Тест: вызывается authenticate с uid из GET-запроса."""
 		self.client.get('/accounts/login?token=abcd123')
@@ -88,7 +88,6 @@ class LoginViewTest(TestCase):
 		)
 
 
-	@patch('accounts.views.auth')
 	def test_calls_auth_login_with_user_if_there_is_one(self, mock_auth):
 		"""Тест: вызывается auth_login с пользователем, если такой не имеется."""
 		response = self.client.get('/accounts/login?token=abcd123')
