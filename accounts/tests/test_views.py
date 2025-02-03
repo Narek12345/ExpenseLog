@@ -95,3 +95,10 @@ class LoginViewTest(TestCase):
 			mock_auth.login.call_args,
 			call(response.wsgi_request, mock_auth.authenticate.return_value)
 		)
+
+
+	def test_does_not_login_if_user_is_not_authenticated(self, mock_auth):
+		"""Тест: не регистрируется в системе, если пользователь не аутентифицирован."""
+		mock_auth.authenticate.return_value = None
+		self.client.get('/accounts/login?token=abcd123')
+		self.assertEqual(mock_auth.login.called, False)
