@@ -1,4 +1,7 @@
+import os
 import re
+import time
+import poplib
 
 from django.core import mail
 
@@ -60,3 +63,38 @@ class LoginTest(FunctionalTest):
 
 		# Она вышла из системы.
 		self.wait_to_be_logged_out(email=TEST_EMAIL)
+
+
+	def wait_for_email(self, test_email, subject):
+		"""Ожидать электронное сообщение."""
+		if not self.staging_server:
+			email = mail.outbox[0]
+			self.assertIn(test_email, email.to)
+			self.assertEqual(email.subject, subject)
+			return email.body
+
+		email_id = None
+		start = time.time()
+		inbox = poplib.POP3_SSL('pop.gmail.com')
+
+		try:
+			inbox.user(test_email)
+			inbox.pass_(os.environ['GMAIL_PASSWORD'])
+
+			while time.time() - start < 60:
+				# Получить 10 самых новых сообщении.
+				count, _ = inbox.stat()
+				for i in reversed(range(max(1, count - 10), count + 1)):
+					print('getting msg', i)
+					_, lines, __ = inbox.retr(1)
+					lines = [l.decode('utf8') for l in lines]
+					print(lines)
+					if f'Subject: {subject}' in lines:
+						email_id = 1
+						body = '\n'.join(lines)
+						return body
+				time.sleep(5)
+		finally:
+			if email_id:
+				inbox.dele(email_id)
+			inbox.quit()
