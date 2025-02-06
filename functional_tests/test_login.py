@@ -13,7 +13,6 @@ from django.core import mail
 from .base import FunctionalTest
 
 
-TEST_EMAIL = 'edith@example.com'
 SUBJECT = 'Your login link for SuperLists'
 
 
@@ -26,6 +25,11 @@ class LoginTest(FunctionalTest):
 		"""Тест: можно получить ссылку по почте для регистрации."""
 		# Эдит заходит на офигительный сайт суперсписков и впервые замечает раздел "войти" в навигационной панели.
 		# Он говорит ей ввести свой адрес электронной почты, что она и делает.
+		if self.staging_server:
+			test_email = 'narekbayanduryan16@gmail.com'
+		else:
+			test_email = 'edith@example.com'
+
 		self.browser.get(self.live_server_url)
 		self.browser.find_element(By.NAME, 'email').send_keys(TEST_EMAIL)
 		self.browser.find_element(By.NAME, 'email').send_keys(Keys.ENTER)
