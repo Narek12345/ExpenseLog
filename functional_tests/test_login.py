@@ -1,12 +1,14 @@
 import os
 import re
 import time
-import poplib
-
-from django.core import mail
+import email
+import imaplib
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from email.header import decode_header
+
+from django.core import mail
 
 from .base import FunctionalTest
 
@@ -68,33 +70,42 @@ class LoginTest(FunctionalTest):
 	def wait_for_email(self, test_email, subject):
 		"""Ожидать электронное сообщение."""
 		if not self.staging_server:
-			email = mail.outbox[0]
-			self.assertIn(test_email, email.to)
-			self.assertEqual(email.subject, subject)
-			return email.body
+			email_out = mail.outbox[0]  # Переименовано здесь
+			self.assertIn(test_email, email_out.to)
+			self.assertEqual(email_out.subject, subject)
+			return email_out.body
 
-		email_id = None
-		start = time.time()
-		inbox = poplib.POP3_SSL('pop.gmail.com')
+		mail = imaplib.IMAP4_SSL('imap.gmail.com')
+		mail.login(test_email, os.getenv('GMAIL_PASSWORD'))
+		mail.select('inbox')
 
-		try:
-			inbox.user(test_email)
-			inbox.pass_(os.environ['GMAIL_PASSWORD'])
+		status, messages = mail.search(None, 'ALL')
+		messages_id = messages[0].split()
 
-			while time.time() - start < 60:
-				# Получить 10 самых новых сообщении.
-				count, _ = inbox.stat()
-				for i in reversed(range(max(1, count - 10), count + 1)):
-					print('getting msg', i)
-					_, lines, __ = inbox.retr(1)
-					lines = [l.decode('utf8') for l in lines]
-					print(lines)
-					if f'Subject: {subject}' in lines:
-						email_id = 1
-						body = '\n'.join(lines)
+		last_messages_id = messages_id[-20:][::-1]
+
+		for message_id in last_messages_id:
+			message_id = str(message_id, 'utf-8')
+			status, msg_data = mail.fetch(message_id, '(RFC822)')
+
+			for response_part in msg_data:
+				if isinstance(response_part, tuple):
+					msg_email = email.message_from_bytes(response_part[1])
+					current_email_subject, encoding = decode_header(msg_email['Subject'])[0]
+
+					if isinstance(current_email_subject, bytes):
+						current_email_subject = current_email_subject.decode(encoding if encoding else "utf-8")
+
+					try:
+						self.assertIn(test_email, msg_email.get('From'))
+						self.assertEqual(current_email_subject, subject)
+
+						body = msg_email.get_payload(decode=True).decode()
+
+						mail.close()
+						mail.logout()
+
+						print(body)
 						return body
-				time.sleep(5)
-		finally:
-			if email_id:
-				inbox.dele(email_id)
-			inbox.quit()
+					except Exception as e:
+						continue
