@@ -31,7 +31,7 @@ class LoginTest(FunctionalTest):
 			test_email = 'edith@example.com'
 
 		self.browser.get(self.live_server_url)
-		self.browser.find_element(By.NAME, 'email').send_keys(TEST_EMAIL)
+		self.browser.find_element(By.NAME, 'email').send_keys(test_email)
 		self.browser.find_element(By.NAME, 'email').send_keys(Keys.ENTER)
 
 		# Появляется сообщение, которое говорит, что ей на почту было выслано электронное письмо.
@@ -45,7 +45,7 @@ class LoginTest(FunctionalTest):
 
 		# Эдит проверяет свою почту и находит сообщение.
 		email = mail.outbox[0]
-		self.assertIn(TEST_EMAIL, email.to)
+		self.assertIn(test_email, email.to)
 		self.assertEqual(email.subject, SUBJECT)
 
 		# Оно содержит ссылку на url-адрес.
@@ -62,13 +62,13 @@ class LoginTest(FunctionalTest):
 		self.browser.get(url)
 
 		# Она зарегестрировалась в системе.
-		self.wait_to_be_logged_in(email=TEST_EMAIL)
+		self.wait_to_be_logged_in(email=test_email)
 
 		# Теперь она выходит из системы.
 		self.browser.find_element(By.LINK_TEXT, 'Log out').click()
 
 		# Она вышла из системы.
-		self.wait_to_be_logged_out(email=TEST_EMAIL)
+		self.wait_to_be_logged_out(email=test_email)
 
 
 	def wait_for_email(self, test_email, subject):
