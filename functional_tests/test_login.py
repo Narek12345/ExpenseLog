@@ -45,7 +45,6 @@ class LoginTest(FunctionalTest):
 
 		# Эдит проверяет свою почту и находит сообщение.
 		body = self.wait_for_email(test_email, SUBJECT)
-		print('\n\n\n', body, '\n\n\n')
 
 		# Оно содержит ссылку на url-адрес.
 		self.assertIn('Use this link to log in', body)
@@ -76,7 +75,6 @@ class LoginTest(FunctionalTest):
 			email_message = mail.outbox[0]
 			self.assertIn(test_email, email_message.to)
 			self.assertEqual(email_message.subject, subject)
-			print('\n\n\n', email_message.body, '\n\n\n')
 			return email_message.body
 
 		mail_client = imaplib.IMAP4_SSL('imap.gmail.com')
