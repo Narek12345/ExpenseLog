@@ -45,6 +45,7 @@ class LoginTest(FunctionalTest):
 
 		# Эдит проверяет свою почту и находит сообщение.
 		body = self.wait_for_email(test_email, SUBJECT)
+		print('\n\n\n', body, '\n\n\n')
 
 		# Оно содержит ссылку на url-адрес.
 		self.assertIn('Use this link to log in', body)
@@ -72,23 +73,24 @@ class LoginTest(FunctionalTest):
 	def wait_for_email(self, test_email, subject):
 		"""Ожидать электронное сообщение."""
 		if not self.staging_server:
-			email_out = mail.outbox[0]  # Переименовано здесь
-			self.assertIn(test_email, email_out.to)
-			self.assertEqual(email_out.subject, subject)
-			return email_out.body
+			email_message = mail.outbox[0]
+			self.assertIn(test_email, email_message.to)
+			self.assertEqual(email_message.subject, subject)
+			print('\n\n\n', email_message.body, '\n\n\n')
+			return email_message.body
 
-		mail = imaplib.IMAP4_SSL('imap.gmail.com')
-		mail.login(test_email, os.getenv('GMAIL_PASSWORD'))
-		mail.select('inbox')
+		mail_client = imaplib.IMAP4_SSL('imap.gmail.com')
+		mail_client.login(test_email, os.getenv('GMAIL_PASSWORD'))
+		mail_client.select('inbox')
 
-		status, messages = mail.search(None, 'ALL')
+		status, messages = mail_client.search(None, 'ALL')
 		messages_id = messages[0].split()
 
 		last_messages_id = messages_id[-20:][::-1]
 
 		for message_id in last_messages_id:
 			message_id = str(message_id, 'utf-8')
-			status, msg_data = mail.fetch(message_id, '(RFC822)')
+			status, msg_data = mail_client.fetch(message_id, '(RFC822)')
 
 			for response_part in msg_data:
 				if isinstance(response_part, tuple):
@@ -97,17 +99,22 @@ class LoginTest(FunctionalTest):
 
 					if isinstance(current_email_subject, bytes):
 						current_email_subject = current_email_subject.decode(encoding if encoding else "utf-8")
-
 					try:
 						self.assertIn(test_email, msg_email.get('From'))
 						self.assertEqual(current_email_subject, subject)
 
-						body = msg_email.get_payload(decode=True).decode()
+						# Разбираем тело сообщения.
+						body = ""
+						if msg_email.is_multipart():
+							for part in msg_email.walk():
+								content_type = part.get_content_type()
+								content_disposition = str(part.get("Content-Disposition"))
 
-						mail.close()
-						mail.logout()
-
-						print(body)
+								if content_type == "text/plain" and "attachment" not in content_disposition:
+									body = part.get_payload(decode=True).decode().strip()
+									break
+						else:
+							body = msg_email.get_payload(decode=True).decode().strip()
 						return body
 					except Exception as e:
 						continue
