@@ -27,14 +27,13 @@ class ItemValidationTest(FunctionalTest):
 		)
 
 		# Эдит начинает набирать текст нового элемента и ошибка исчезает.
-		self.get_item_input_box().send_keys('Buy milk')
+		self.add_list_item('Buy milk')
 		self.wait_for(
 			lambda:
 				self.browser.find_elements(By.CSS_SELECTOR, '#id_text:valid')
 		)
 
 		# И она может отправить его успешно.
-		self.get_item_input_box().send_keys(Keys.ENTER)
 		self.wait_for_row_in_list_table('1: Buy milk')
 
 		# Как ни странно, Эдит решает отправить второй пустой элемент списка.
@@ -48,13 +47,12 @@ class ItemValidationTest(FunctionalTest):
 		)
 
 		# И она может исправиться, заполнив поле текстом.
-		self.get_item_input_box().send_keys('Make tea')
+		self.add_list_item('Make tea')
 		self.wait_for(
 			lambda:
 				self.browser.find_elements(By.CSS_SELECTOR, '#id_text:valid')
 		)
 
-		self.get_item_input_box().send_keys(Keys.ENTER)
 		self.wait_for_row_in_list_table('1: Buy milk')
 		self.wait_for_row_in_list_table('2: Make tea')
 
@@ -63,13 +61,11 @@ class ItemValidationTest(FunctionalTest):
 		"""Тест: нельзя добавлять повторяющиеся элементы."""
 		# Эдит открывает домашнюю страницу и начинает новый список.
 		self.browser.get(self.live_server_url)
-		self.get_item_input_box().send_keys('Buy wellies')
-		self.get_item_input_box().send_keys(Keys.ENTER)
+		self.add_list_item('Buy wellies')
 		self.wait_for_row_in_list_table('1: Buy wellies')
 
 		# Она случайно пытается ввести повторяющийся элемент.
-		self.get_item_input_box().send_keys('Buy wellies')
-		self.get_item_input_box().send_keys(Keys.ENTER)
+		self.add_list_item('Buy wellies')
 
 		# Она видит полезное сообщение об ошибке.
 		self.wait_for(
@@ -85,11 +81,9 @@ class ItemValidationTest(FunctionalTest):
 		"""Тест: сообщения об ошибках очищаются при вводе."""
 		# Эдит начинает список и вызывает ошибку валидации:
 		self.browser.get(self.live_server_url)
-		self.get_item_input_box().send_keys('Banter too thick')
-		self.get_item_input_box().send_keys(Keys.ENTER)
+		self.add_list_item('Banter too thick')
 		self.wait_for_row_in_list_table('1: Banter too thick')
-		self.get_item_input_box().send_keys('Banter too thick')
-		self.get_item_input_box().send_keys(Keys.ENTER)
+		self.add_list_item('Banter too thick')
 
 		self.wait_for(
 			lambda: 

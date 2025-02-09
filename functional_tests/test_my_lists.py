@@ -1,3 +1,5 @@
+from selenium.webdriver.common.by import By
+
 from django.conf import settings
 
 from .base import FunctionalTest
