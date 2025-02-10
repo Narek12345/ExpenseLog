@@ -76,7 +76,7 @@ class ListAndItemModelsTest(TestCase):
 		)
 
 
-	def test_string_representaion(self):
+	def test_string_representation(self):
 		"""Тест строкового представления."""
 		item = Item(text='some text')
 		self.assertEqual(str(item), 'some text')
