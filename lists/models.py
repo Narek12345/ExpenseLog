@@ -1,10 +1,12 @@
 from django.db import models
 from django.urls import reverse
+from django.conf import settings
 
 
 
 class List(models.Model):
 	"""Список с элементами."""
+	owner = models.ForeignKey(settings.AUTH_USER_MODEL)
 	
 
 	def get_absolute_url(self):
