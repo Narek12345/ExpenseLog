@@ -34,3 +34,9 @@ def login(request):
 	if user:
 		auth.login(request, user)
 	return redirect('/')
+
+
+def logout(request):
+	"""Выйти из системы."""
+	auth.logout(request)
+	return redirect('/')
