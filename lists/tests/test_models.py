@@ -15,11 +15,6 @@ class ItemModelTest(TestCase):
 		self.assertEqual(item.text, '')
 
 
-
-class ListAndItemModelsTest(TestCase):
-	"""Тест модели элемента списка."""
-
-
 	def test_item_is_related_to_list(self):
 		"""Тест: элемент связан со списком."""
 		list_ = List.objects.create()
@@ -36,12 +31,6 @@ class ListAndItemModelsTest(TestCase):
 		with self.assertRaises(ValidationError):
 			item.save()
 			item.full_clean()
-
-
-	def test_get_absolute_url(self):
-		"""Тест: получен абсолютный url."""
-		list_ = List.objects.create()
-		self.assertEqual(list_.get_absolute_url(), f'/lists/{list_.id}')
 
 
 	def test_duplicate_items_are_invalid(self):
@@ -80,3 +69,15 @@ class ListAndItemModelsTest(TestCase):
 		"""Тест строкового представления."""
 		item = Item(text='some text')
 		self.assertEqual(str(item), 'some text')
+
+
+
+
+class ListModelTest(TestCase):
+	"""тест модели списка."""
+
+
+	def test_get_absolute_url(self):
+		"""Тест: получен абсолютный url."""
+		list_ = List.objects.create()
+		self.assertEqual(list_.get_absolute_url(), f'/lists/{list_.id}')
