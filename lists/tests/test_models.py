@@ -92,3 +92,8 @@ class ListModelTest(TestCase):
 		user = User.objects.create(email='a@b.com')
 		list_ = List.objects.create(owner=user)
 		self.assertIn(list_, user.list_set.all())
+
+
+	def test_list_owner_is_optional(self):
+		"""Тест: владелец списка является необязательным."""
+		List.objects.create()
