@@ -6,7 +6,7 @@ from django.conf import settings
 
 class List(models.Model):
 	"""Список с элементами."""
-	owner = models.ForeignKey(settings.AUTH_USER_MODEL)
+	owner = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.CASCADE)
 	
 
 	def get_absolute_url(self):
