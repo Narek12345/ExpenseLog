@@ -78,7 +78,7 @@ class ItemModelTest(TestCase):
 
 
 class ListModelTest(TestCase):
-	"""тест модели списка."""
+	"""Тест модели списка."""
 
 
 	def test_get_absolute_url(self):
@@ -97,3 +97,11 @@ class ListModelTest(TestCase):
 	def test_list_owner_is_optional(self):
 		"""Тест: владелец списка является необязательным."""
 		List.objects.create()
+
+
+	def test_list_name_is_first_item_text(self):
+		"""Тест: имя списка является текстом первого элемента."""
+		list_ = List.objects.create()
+		Item.objects.create(list=list_, text='first item')
+		Item.objects.create(list=list_, text='second item')
+		self.assertEqual(list_.name, 'first item')
